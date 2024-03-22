@@ -8,8 +8,8 @@ imgui.ini
 *.o
 *.obj
 *.exe
-/obj
-/bin
+/intermediate
+/binary
 
 ## Visual Studio artifacts
 .vs
