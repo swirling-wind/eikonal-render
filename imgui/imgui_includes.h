@@ -48,7 +48,7 @@ static inline GLFWwindow* initialize_window_glsl_450()
         return nullptr;
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(0); // Enable / Disable vsync
+    glfwSwapInterval(1); // Enable / Disable vsync
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cerr << "Failed to initialize GLAD" << std::endl;
