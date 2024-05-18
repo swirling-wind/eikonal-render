@@ -1,29 +1,12 @@
 #include <imgui_includes.h>
-#include <iostream>
 
-
-int main(int, char**)
+int main()
 {
-    glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
-        return 1;
     const char* glsl_version = "#version 450"; // GL 4.0 + GLSL 450
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-
-    // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    GLFWwindow* window = initialize_window_glsl_450();
     if (window == nullptr)
-        return 1;
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(0); // Enable vsync
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return 1;
     }
 
     // Setup Dear ImGui context
@@ -32,11 +15,8 @@ int main(int, char**)
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/consola.ttf", 16.0f);
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;   // Enable Keyboard Controls and Gamepad Controls
-
     ImGui::StyleColorsDark();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(window, true); // Setup Platform/Renderer backends
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     const GLubyte* renderer = glGetString(GL_RENDERER);
@@ -114,10 +94,8 @@ int main(int, char**)
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
     glfwDestroyWindow(window);
     glfwTerminate();
-
     return 0;
 }
 
