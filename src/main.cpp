@@ -11,7 +11,8 @@ void framebuffer_size_callback(GLFWwindow*, const int width, const int height)
     glViewport(0, 0, width, height);
 }
 
-int main(){
+int main()
+{
     const char* glsl_version = "#version 450"; // GL 4.0 + GLSL 450
     GLFWwindow* window = initialize_window_glsl_450();
     if (window == nullptr)
@@ -22,9 +23,11 @@ int main(){
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
     io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/consola.ttf", 16.0f);
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;   // Enable Keyboard Controls and Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+    // Enable Keyboard Controls and Gamepad Controls
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true); // Setup Platform/Renderer backends
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -45,7 +48,7 @@ int main(){
         "{\n"
         "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
         "}\n\0";
-    int  success;
+    int success;
     char infoLog[512];
     // vertex shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -55,7 +58,7 @@ int main(){
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << '\n';
     }
     // fragment shader
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -65,7 +68,7 @@ int main(){
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << '\n';
     }
 
     // link shaders
@@ -74,24 +77,25 @@ int main(){
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << '\n';
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
     // set up vertex data
     float vertices[] = {
-    0.5f, 0.5f, 0.0f,   // 右上角
-    0.5f, -0.5f, 0.0f,  // 右下角
-    -0.5f, -0.5f, 0.0f, // 左下角
-    -0.5f, 0.5f, 0.0f   // 左上角
+        0.5f, 0.5f, 0.0f, // 右上角
+        0.5f, -0.5f, 0.0f, // 右下角
+        -0.5f, -0.5f, 0.0f, // 左下角
+        -0.5f, 0.5f, 0.0f // 左上角
     };
 
     unsigned int indices[] = {
         0, 1, 3, // 第一个三角形
-        1, 2, 3  // 第二个三角形
+        1, 2, 3 // 第二个三角形
     };
 
     unsigned int VBO, VAO, EBO;
@@ -114,7 +118,6 @@ int main(){
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -122,29 +125,29 @@ int main(){
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         {
+            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
 
-            ImGui::Begin("Hello, world!");        // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");      // Display some text (you can use a format strings too)
+            ImGui::Text("This is some useful text."); // Display some text (you can use a format strings too)
             ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&clear_color));
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
         }
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
+                     clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
         glUseProgram(shaderProgram);
-        float timeValue = glfwGetTime();
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+        //float timeValue = static_cast<float>(glfwGetTime());
+        //float greenValue = sin(timeValue) / 2.0f + 0.5f;
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
 
-        ImGui::Render(); 
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());       
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
     }
 
@@ -160,5 +163,3 @@ int main(){
     glfwTerminate();
     return 0;
 }
-
-
