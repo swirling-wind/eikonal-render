@@ -99,27 +99,38 @@ int main()
     };
 
     unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
-    glBindVertexArray(VAO);
+    glCreateVertexArrays(1, &VAO);
+    glCreateBuffers(1, &VBO);
+    glCreateBuffers(1, &EBO);
+    glNamedBufferData(VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glNamedBufferData(EBO, sizeof(indices), indices, GL_STATIC_DRAW);
+    glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
+    glVertexArrayElementBuffer(VAO, EBO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glEnableVertexArrayAttrib(VAO, 0);
+    glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(VAO, 0, 0);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+     // glGenVertexArrays(1, &VAO);
+     // glGenBuffers(1, &VBO);
+     // glGenBuffers(1, &EBO);
+     // glBindVertexArray(VAO);
+     //     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+     //         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+     //
+     //         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+     //         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+     //
+     //         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
+     //         glEnableVertexAttribArray(0);
+     //
+     //     glBindBuffer(GL_ARRAY_BUFFER, 0);
+     // glBindVertexArray(0);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
-            glEnableVertexAttribArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
 
     while (!glfwWindowShouldClose(window))
     {
