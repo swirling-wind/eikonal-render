@@ -1,4 +1,5 @@
 #include <imgui_includes.h>
+
 #include "shader.h"
 
 void process_input(GLFWwindow* window)
@@ -37,8 +38,12 @@ int main()
     std::cout << "Renderer: " << renderer << '\n';
     std::cout << "OpenGL version supported: " << version << '\n';
 
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
+    std::cout << nrChannels << "\n";
+
     Shader our_shader("shaders/test.vs.glsl", "shaders/test.fs.glsl");
-    our_shader.use();
+    glUseProgram(our_shader.ID);
 
     // set up vertex data
     float vertices[] = {
@@ -46,10 +51,6 @@ int main()
          0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
         -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
          0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
-    };
-
-    unsigned int indices[] = {
-        0, 1, 2, // 第一个三角形
     };
 
     unsigned int VBO, VAO;
@@ -67,6 +68,7 @@ int main()
     glEnableVertexArrayAttrib(VAO, 1);
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    float x_offset = 0.0f;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -75,26 +77,25 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         {
-            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text."); // Display some text (you can use a format strings too)
+            ImGui::Begin("Editor");
             ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&clear_color));
-
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+            ImGui::Separator();
+
+            ImGui::SliderFloat("Position offset", &x_offset, -1.0f, 1.0f);
+
             ImGui::End();
         }
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
                      clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        
+        int pos_offset_location = glGetUniformLocation(our_shader.ID, "pos_offset");
+        glUniform1f(pos_offset_location, x_offset);
+
         glBindVertexArray(VAO);
-        float timeValue = static_cast<float>(glfwGetTime());
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
-
-
         glDrawArrays(GL_TRIANGLES, 0, 3);
-
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -104,8 +105,6 @@ int main()
     // Cleanup
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    //glDeleteProgram(shaderProgram);
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
