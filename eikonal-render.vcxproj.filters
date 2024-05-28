@@ -10,6 +10,9 @@
     <Filter Include="src">
       <UniqueIdentifier>{2c291335-ac96-4fdd-9064-aacf0464e924}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{51e8ae2f-2881-44ae-9e52-dbbe076f41b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imgui.h">
@@ -42,6 +45,9 @@
     <ClInclude Include="imgui\imgui_includes.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\shader.h">
+      <Filter>shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\imgui_demo.cpp">
@@ -71,5 +77,13 @@
     <ClCompile Include="src\glad.c">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\vertex.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="fragment.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

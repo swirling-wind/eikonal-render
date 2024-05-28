@@ -38,15 +38,19 @@ int main()
 
     const char* vertexShaderSource = "#version 450 core\n"
         "layout (location = 0) in vec3 aPos;\n"
+        "layout (location = 1) in vec3 aColor;\n"
+        "out vec3 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "   gl_Position = vec4(aPos, 1.0);\n"
+        "   ourColor = aColor;\n"
         "}\0";
     const char* fragmentShaderSource = "#version 450 core\n"
         "out vec4 FragColor;\n"
+        "in vec3 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "   FragColor = vec4(ourColor, 1.0);\n"
         "}\n\0";
     int success;
     char infoLog[512];
@@ -87,49 +91,63 @@ int main()
 
     // set up vertex data
     float vertices[] = {
-        0.5f, 0.5f, 0.0f, // 右上角
-        0.5f, -0.5f, 0.0f, // 右下角
-        -0.5f, -0.5f, 0.0f, // 左下角
-        -0.5f, 0.5f, 0.0f // 左上角
+    // 位置              // 颜色
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
     };
 
     unsigned int indices[] = {
-        0, 1, 3, // 第一个三角形
-        1, 2, 3 // 第二个三角形
+        0, 1, 2, // 第一个三角形
     };
 
-    unsigned int VBO, VAO, EBO;
-
+    unsigned int VBO, VAO;
     glCreateVertexArrays(1, &VAO);
     glCreateBuffers(1, &VBO);
-    glCreateBuffers(1, &EBO);
     glNamedBufferData(VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glNamedBufferData(EBO, sizeof(indices), indices, GL_STATIC_DRAW);
-    glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 3 * sizeof(float));
-    glVertexArrayElementBuffer(VAO, EBO);
-
-    glEnableVertexArrayAttrib(VAO, 0);
+    glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 6 * sizeof(float));
+    // position attribute
     glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
     glVertexArrayAttribBinding(VAO, 0, 0);
-
-     // glGenVertexArrays(1, &VAO);
-     // glGenBuffers(1, &VBO);
-     // glGenBuffers(1, &EBO);
-     // glBindVertexArray(VAO);
-     //     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-     //         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-     //
-     //         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-     //         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-     //
-     //         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
-     //         glEnableVertexAttribArray(0);
-     //
-     //     glBindBuffer(GL_ARRAY_BUFFER, 0);
-     // glBindVertexArray(0);
+    glEnableVertexArrayAttrib(VAO, 0);
+    // Color attribute
+    glVertexArrayAttribFormat(VAO, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+    glVertexArrayAttribBinding(VAO, 1, 0);
+    glEnableVertexArrayAttrib(VAO, 1);
 
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glGenVertexArrays(1, &VAO);
+    //glGenBuffers(1, &VBO);
+    //// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    //glBindVertexArray(VAO);
+
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //// position attribute
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), static_cast<void*>(nullptr));
+    //glEnableVertexAttribArray(0);
+    //// color attribute
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+    //glEnableVertexAttribArray(1);
+
+
+    // unsigned int VBO, VAO, EBO;
+    // glCreateVertexArrays(1, &VAO);
+    // glCreateBuffers(1, &VBO);
+    // glCreateBuffers(1, &EBO);
+    // glNamedBufferData(VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // glNamedBufferData(EBO, sizeof(indices), indices, GL_STATIC_DRAW);
+    // glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 6 * sizeof(float));
+    // glVertexArrayVertexBuffer(VAO, 1, VBO, 3, 6 * sizeof(float));
+    // glVertexArrayElementBuffer(VAO, EBO);
+    //
+    // glEnableVertexArrayAttrib(VAO, 0);
+    // glEnableVertexArrayAttrib(VAO, 1);
+    // glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    // glVertexArrayAttribBinding(VAO, 0, 0);
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     while (!glfwWindowShouldClose(window))
@@ -153,8 +171,17 @@ int main()
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        
+        // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+        // glBindVertexArray(0);
+
+
+        float timeValue = static_cast<float>(glfwGetTime());
+        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
