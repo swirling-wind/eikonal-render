@@ -1,4 +1,5 @@
 #include <imgui_includes.h>
+#include "shader.h"
 
 void process_input(GLFWwindow* window)
 {
@@ -88,6 +89,8 @@ int main()
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    
 
     // set up vertex data
     float vertices[] = {

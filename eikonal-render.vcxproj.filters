@@ -45,8 +45,8 @@
     <ClInclude Include="imgui\imgui_includes.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="shaders\shader.h">
-      <Filter>shaders</Filter>
+    <ClInclude Include="src\shader.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -79,10 +79,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\vertex.glsl">
+    <None Include="shaders\test.vs.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="fragment.glsl">
+    <None Include="test.fs.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
