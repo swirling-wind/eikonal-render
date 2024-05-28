@@ -82,7 +82,7 @@
     <None Include="shaders\test.vs.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="test.fs.glsl">
+    <None Include="shaders\test.fs.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

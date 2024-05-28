@@ -37,60 +37,8 @@ int main()
     std::cout << "Renderer: " << renderer << '\n';
     std::cout << "OpenGL version supported: " << version << '\n';
 
-    const char* vertexShaderSource = "#version 450 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "layout (location = 1) in vec3 aColor;\n"
-        "out vec3 ourColor;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(aPos, 1.0);\n"
-        "   ourColor = aColor;\n"
-        "}\0";
-    const char* fragmentShaderSource = "#version 450 core\n"
-        "out vec4 FragColor;\n"
-        "in vec3 ourColor;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(ourColor, 1.0);\n"
-        "}\n\0";
-    int success;
-    char infoLog[512];
-    // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << '\n';
-    }
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << '\n';
-    }
-
-    // link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << '\n';
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    
+    Shader our_shader("shaders/test.vs.glsl", "shaders/test.fs.glsl");
+    our_shader.use();
 
     // set up vertex data
     float vertices[] = {
@@ -118,39 +66,6 @@ int main()
     glVertexArrayAttribBinding(VAO, 1, 0);
     glEnableVertexArrayAttrib(VAO, 1);
 
-
-    //glGenVertexArrays(1, &VAO);
-    //glGenBuffers(1, &VBO);
-    //// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    //glBindVertexArray(VAO);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    //// position attribute
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), static_cast<void*>(nullptr));
-    //glEnableVertexAttribArray(0);
-    //// color attribute
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-
-
-    // unsigned int VBO, VAO, EBO;
-    // glCreateVertexArrays(1, &VAO);
-    // glCreateBuffers(1, &VBO);
-    // glCreateBuffers(1, &EBO);
-    // glNamedBufferData(VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // glNamedBufferData(EBO, sizeof(indices), indices, GL_STATIC_DRAW);
-    // glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 6 * sizeof(float));
-    // glVertexArrayVertexBuffer(VAO, 1, VBO, 3, 6 * sizeof(float));
-    // glVertexArrayElementBuffer(VAO, EBO);
-    //
-    // glEnableVertexArrayAttrib(VAO, 0);
-    // glEnableVertexArrayAttrib(VAO, 1);
-    // glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
-    // glVertexArrayAttribBinding(VAO, 0, 0);
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     while (!glfwWindowShouldClose(window))
@@ -172,13 +87,8 @@ int main()
                      clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
         
-        // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-        // glBindVertexArray(0);
-
-
+        glBindVertexArray(VAO);
         float timeValue = static_cast<float>(glfwGetTime());
         float greenValue = sin(timeValue) / 2.0f + 0.5f;
 
@@ -194,7 +104,7 @@ int main()
     // Cleanup
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    //glDeleteProgram(shaderProgram);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

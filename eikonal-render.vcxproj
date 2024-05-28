@@ -183,7 +183,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="test.fs.glsl" />
+    <None Include="shaders\test.fs.glsl" />
     <None Include="shaders\test.vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
