@@ -1,15 +1,12 @@
-#ifndef _imgui_includes_h_
-#define _imgui_includes_h_
+#ifndef GLFW_INIT
+#define GLFW_INIT
 
 // Learn about Dear ImGui:
 // - FAQ                  https://dearimgui.com/faq
 // - Getting Started      https://dearimgui.com/getting-started
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
-
-#include "imgui.h"
 #include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 
 #include <glad/glad.h>
 #define GL_SILENCE_DEPRECATION
@@ -30,10 +27,11 @@
 
 static void glfw_error_callback(int error, const char* description)
 {
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+    auto res = fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+    std::cerr << "glfw_error_callback: " << res << "\n";
 }
 
-static inline GLFWwindow* initialize_window_glsl_450()
+static GLFWwindow* initialize_window_glsl_450()
 {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -52,12 +50,12 @@ static inline GLFWwindow* initialize_window_glsl_450()
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable / Disable vsync
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
     {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
+        std::cerr << "Failed to initialize GLAD" << '\n';
         return nullptr;
     }
     return window;
 }
 
-#endif // !_imgui_includes_h_
+#endif // !GLFW_INIT

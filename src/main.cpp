@@ -1,5 +1,6 @@
-#include <imgui_includes.h>
-
+#include <glfw_init.h>
+#include "imgui.h"
+#include "imgui_impl_opengl3.h"
 #include "shader.h"
 
 void process_input(GLFWwindow* window)
@@ -39,8 +40,12 @@ int main()
     std::cout << "OpenGL version supported: " << version << '\n';
 
     int width, height, nrChannels;
-    unsigned char* data = stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char* tex = stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
     std::cout << nrChannels << "\n";
+
+
+
+
 
     Shader our_shader("shaders/test.vs.glsl", "shaders/test.fs.glsl");
     glUseProgram(our_shader.ID);

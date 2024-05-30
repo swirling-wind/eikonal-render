@@ -62,7 +62,7 @@ private:
         return shader;
     }
 
-    void checkCompileErrors(unsigned int shader, const std::string& type)
+    static void checkCompileErrors(unsigned int shader, const std::string& type)
     {
         int success;
         char infoLog[1024];
@@ -72,7 +72,7 @@ private:
             if (!success)
             {
                 glGetShaderInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
-                std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " <<
+                std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------- -- " <<
                     '\n';
             }
         }
@@ -82,7 +82,7 @@ private:
             if (!success)
             {
                 glGetProgramInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
-                std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " <<
+                std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------- -- " <<
                     '\n';
             }
         }
