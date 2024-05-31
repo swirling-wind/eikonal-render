@@ -31,6 +31,10 @@ static void glfw_error_callback(int error, const char* description)
     std::cerr << "glfw_error_callback: " << res << "\n";
 }
 
+inline void* glad_load_proc_wrapper(const char* name) {
+    return reinterpret_cast<void*>(glfwGetProcAddress(name));
+}
+
 static GLFWwindow* initialize_window_glsl_450()
 {
     glfwSetErrorCallback(glfw_error_callback);
@@ -50,7 +54,7 @@ static GLFWwindow* initialize_window_glsl_450()
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable / Disable vsync
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+    if (!gladLoadGLLoader(glad_load_proc_wrapper))
     {
         std::cerr << "Failed to initialize GLAD" << '\n';
         return nullptr;

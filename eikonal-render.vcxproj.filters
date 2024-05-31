@@ -42,11 +42,11 @@
     <ClInclude Include="imgui\backends\imgui_impl_opengl3_loader.h">
       <Filter>imgui\backends</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_includes.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="src\shader.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\glfw_init.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

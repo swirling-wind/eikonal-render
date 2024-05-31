@@ -44,9 +44,6 @@ int main()
     std::cout << nrChannels << "\n";
 
 
-
-
-
     Shader our_shader("shaders/test.vs.glsl", "shaders/test.fs.glsl");
     glUseProgram(our_shader.ID);
 
