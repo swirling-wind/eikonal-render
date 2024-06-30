@@ -39,35 +39,76 @@ int main()
     std::cout << "Renderer: " << renderer << '\n';
     std::cout << "OpenGL version supported: " << version << '\n';
 
-    int width, height, nrChannels;
-    unsigned char* tex = stbi_load("assets/container.jpg", &width, &height, &nrChannels, 0);
-    std::cout << nrChannels << "\n";
-
-
     Shader our_shader("shaders/test.vs.glsl", "shaders/test.fs.glsl");
     glUseProgram(our_shader.ID);
 
     // set up vertex data
     float vertices[] = {
-    // 位置              // 颜色
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
+        // positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
     };
-
-    unsigned int VBO, VAO;
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+    unsigned int VBO, VAO, EBO;
+    // Create Vertex Array Object
     glCreateVertexArrays(1, &VAO);
+
+    // Create Vertex Buffer Object
     glCreateBuffers(1, &VBO);
     glNamedBufferData(VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 6 * sizeof(float));
-    // position attribute
+
+    // Create Element Buffer Object
+    glCreateBuffers(1, &EBO);
+    glNamedBufferData(EBO, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Specify vertex attributes for VAO
     glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
     glVertexArrayAttribBinding(VAO, 0, 0);
     glEnableVertexArrayAttrib(VAO, 0);
-    // Color attribute
+
     glVertexArrayAttribFormat(VAO, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
     glVertexArrayAttribBinding(VAO, 1, 0);
     glEnableVertexArrayAttrib(VAO, 1);
+
+    glVertexArrayAttribFormat(VAO, 2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float));
+    glVertexArrayAttribBinding(VAO, 2, 0);
+    glEnableVertexArrayAttrib(VAO, 2);
+
+    // Link buffer objects to the VAO
+    glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 8 * sizeof(float));
+    glVertexArrayElementBuffer(VAO, EBO);
+
+    // load and create a texture 
+    // -------------------------
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << '\n';
+    }
+    stbi_image_free(data);
+
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     float x_offset = 0.0f;
@@ -90,14 +131,15 @@ int main()
             ImGui::End();
         }
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
-                     clear_color.w);
+            clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
         int pos_offset_location = glGetUniformLocation(our_shader.ID, "pos_offset");
         glUniform1f(pos_offset_location, x_offset);
 
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
