@@ -35,7 +35,7 @@ inline void* glad_load_proc_wrapper(const char* name) {
     return reinterpret_cast<void*>(glfwGetProcAddress(name));
 }
 
-static GLFWwindow* initialize_window_glsl_450()
+static GLFWwindow* initialize_window_glsl_450(const int window_width, const int window_height)
 {
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -47,7 +47,7 @@ static GLFWwindow* initialize_window_glsl_450()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL example", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Dear ImGui GLFW+OpenGL example", nullptr, nullptr);
     if (window == nullptr)
     {
         return nullptr;
