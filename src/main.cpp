@@ -83,31 +83,69 @@ int main()
     glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 8 * sizeof(float));
     glVertexArrayElementBuffer(VAO, EBO);
 
-    // load and create a texture 
-    // -------------------------
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
+    // load and create a texture
+    stbi_set_flip_vertically_on_load(true);
     int width, height, nrChannels;
-    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char* data;
+    // -------------------------
+    unsigned int texture1;
+    glCreateTextures(GL_TEXTURE_2D, 1, &texture1);
+
+    // set the texture wrapping parameters
+    glTextureParameteri(texture1, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(texture1, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    glTextureParameteri(texture1, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTextureParameteri(texture1, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glTextureStorage2D(texture1, 3, GL_RGB8, width, height);
+        glTextureSubImage2D(texture1, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateTextureMipmap(texture1);
     }
     else
     {
-        std::cout << "Failed to load texture" << '\n';
+        std::cout << "Failed to load texture1" << '\n';
     }
     stbi_image_free(data);
+    // -------------------------
+    unsigned int texture2;
+    glCreateTextures(GL_TEXTURE_2D, 1, &texture2);
+
+    // set the texture wrapping parameters
+    glTextureParameteri(texture2, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(texture2, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // set texture filtering parameters
+    glTextureParameteri(texture2, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTextureParameteri(texture2, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load image, create texture and generate mipmaps
+    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTextureStorage2D(texture2, 3, GL_RGB8, width, height);
+        glTextureSubImage2D(texture2, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateTextureMipmap(texture2);
+    }
+    else
+    {
+        std::cout << "Failed to load 2" << '\n';
+    }
+    stbi_image_free(data);
+
+
+    GLint texture1Location = glGetUniformLocation(our_shader.ID, "texture1");
+    GLint texture2Location = glGetUniformLocation(our_shader.ID, "texture2");
+
+    glUniform1i(texture1Location, 0);
+    glUniform1i(texture2Location, 1);
+    glBindTextureUnit(0, texture1);
+    glBindTextureUnit(1, texture2);
 
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -137,7 +175,7 @@ int main()
         int pos_offset_location = glGetUniformLocation(our_shader.ID, "pos_offset");
         glUniform1f(pos_offset_location, x_offset);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, texture1);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
