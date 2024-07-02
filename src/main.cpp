@@ -3,6 +3,10 @@
 #include "imgui_impl_opengl3.h"
 #include "shader.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 void process_input(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -147,7 +151,6 @@ int main()
     glBindTextureUnit(0, texture1);
     glBindTextureUnit(1, texture2);
 
-
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     float x_offset = 0.0f;
 
@@ -172,8 +175,15 @@ int main()
             clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        int pos_offset_location = glGetUniformLocation(our_shader.ID, "pos_offset");
+        GLint pos_offset_location = glGetUniformLocation(our_shader.ID, "pos_offset");
         glUniform1f(pos_offset_location, x_offset);
+
+        
+        GLint transform_loc = glGetUniformLocation(our_shader.ID, "transform");
+        glm::mat4 trans {1.0f};
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm::value_ptr(trans));
 
         glBindTexture(GL_TEXTURE_2D, texture1);
         glBindVertexArray(VAO);
